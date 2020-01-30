@@ -29,3 +29,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+/src/client/node_modules/
