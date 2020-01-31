@@ -11,7 +11,7 @@ import java.util.UUID;
 public class StudentController {
 
     @GetMapping("api/students")
-    @CrossOrigin(origins = "*")
+    @CrossOrigin(origins = "http://localhost:3000")
     public List<Student> getAllStudents() {
         return List.of(
                 new Student(UUID.randomUUID(), "Filip", "Hagno", "fhagno@yahoo.com", Student.Gender.MALE),
