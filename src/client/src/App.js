@@ -1,18 +1,21 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
-import apiService from "../src/apiService/apiService";
-import {Avatar, Table, Spin, Icon} from "antd"
+import {Avatar, Table, Spin, Icon, Modal} from "antd"
 import Container from "./components/Container";
+import Footer from "./components/Footer";
+import AddStudentForm from "./components/AddStudentForm";
+import {fetchAllStudents} from "./apiService/apiService";
 
 
 function App() {
 
     let [students, setStudents] = useState([]);
     let [fetching, setFetching] = useState(false);
+    let [isModalVisible, setModalVisible] = useState(false);
 
     useEffect(() => {
         setFetching(true);
-        apiService.fetchAllStudents()
+        fetchAllStudents()
             .then(resp => resp.json())
             .then(data => setStudents(data))
             .then(() => setFetching(false))
@@ -21,6 +24,14 @@ function App() {
                 setFetching(false);
             });
     }, []);
+
+    const openModal =()=> {
+        setModalVisible(true);
+    };
+
+    const closeModal =()=> {
+        setModalVisible(false);
+    };
 
     const columns = [
         {
@@ -69,7 +80,17 @@ function App() {
                     dataSource={students}
                     columns={columns}
                     rowKey="studentId"/>}
+                    <Modal
+                        title={"Add new student"}
+                        visible={isModalVisible}
+                        onOk={closeModal}
+                        onCancel={closeModal}
+                        width={1000}
+                    >
+                        <AddStudentForm />
+                    </Modal>
             </div>
+            <Footer numberOfStudents={students.length} openModal={openModal}/>
         </Container>
     );
 }

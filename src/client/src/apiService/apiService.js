@@ -1,9 +1,13 @@
 import fetch from "unfetch";
 
-class ApiService {
-    fetchAllStudents = ()=> {
-       return fetch("/api/students")
-    }
-}
+export const fetchAllStudents = () => {
+    return fetch("/api/students");
+};
 
-export default new ApiService();
+export const saveNewStudent = (values)=> {
+  return fetch("api/students", values)
+};
+
+
+
+
