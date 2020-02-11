@@ -1,35 +1,59 @@
-import React, {useEffect, useState} from 'react';
-import './App.css';
-import {Avatar, Table, Spin, Icon, Modal} from "antd"
+import React, {useEffect, useState} from "react";
+import "./App.css";
+import {Avatar, Table, Spin, Icon, Modal, notification} from "antd";
 import Container from "./components/Container";
 import Footer from "./components/Footer";
 import AddStudentForm from "./components/AddStudentForm";
 import {fetchAllStudents} from "./apiService/apiService";
 
-
 function App() {
-
     let [students, setStudents] = useState([]);
     let [fetching, setFetching] = useState(false);
     let [isModalVisible, setModalVisible] = useState(false);
 
-    useEffect(() => {
+    const fetchStudents = () => {
         setFetching(true);
         fetchAllStudents()
+            .then(checkStatus)
             .then(resp => resp.json())
-            .then(data => setStudents(data))
+            .then(data => {
+              setStudents(data)
+              openNotification("info", "students fetched", "Got all students from the server");
+            })
             .then(() => setFetching(false))
             .catch(error => {
-                console.log(error);
+                let description = error.error.status + " " + error.error.error;
+                let message = "Oppps something went wrong;(";
+                openNotification("error", message, description);
                 setFetching(false);
             });
-    }, []);
+    };
 
-    const openModal =()=> {
+    const openNotification = (type, message, description) => {
+        notification[type]({
+            message: message,
+            description: description
+        });
+    };
+
+    const checkStatus = resp => {
+        if (resp.ok) {
+            return resp;
+        } else {
+            let error = new Error(resp.statusText);
+            error.resp = resp;
+            resp.json().then(err => (error.error = err));
+            return Promise.reject(error);
+        }
+    };
+
+    useEffect(fetchStudents, []);
+
+    const openModal = () => {
         setModalVisible(true);
     };
 
-    const closeModal =()=> {
+    const closeModal = () => {
         setModalVisible(false);
     };
 
@@ -39,7 +63,9 @@ function App() {
             key: "avatar",
             render: (text, student) => (
                 <Avatar size={"large"}>
-                    {`${student.firstName.charAt(0).toLocaleUpperCase()}${student.lastName.charAt(0).toUpperCase()}`}
+                    {`${student.firstName
+                        .charAt(0)
+                        .toLocaleUpperCase()}${student.lastName.charAt(0).toUpperCase()}`}
                 </Avatar>
             )
         },
@@ -65,30 +91,48 @@ function App() {
         }
     ];
 
-    const indicator = <Icon type={"loading"} style={{fontSize: "24"}} spin={"true"}/>;
+    const indicator = (
+        <Icon type={"loading"} style={{fontSize: "24"}} spin={"true"}/>
+    );
 
     return (
         <Container>
             <div style={{textAlign: "center"}}>
-            {fetching && <Spin style={{flex: 1}} size={"large"} spinning={true} indicator={indicator}/>}
+                {fetching && (
+                    <Spin
+                        style={{flex: 1}}
+                        size={"large"}
+                        spinning={true}
+                        indicator={indicator}
+                    />
+                )}
             </div>
             <div>
-                {(!students.length && !fetching) && <h2>No students found</h2>}
-                {students.length &&
-                <Table
-                    pagination={false}
-                    dataSource={students}
-                    columns={columns}
-                    rowKey="studentId"/>}
-                    <Modal
-                        title={"Add new student"}
-                        visible={isModalVisible}
-                        onOk={closeModal}
-                        onCancel={closeModal}
-                        width={1000}
-                    >
-                        <AddStudentForm />
-                    </Modal>
+                {!students.length && !fetching && <h2>No students found</h2>}
+                {students.length > 0 && (
+                    <Table
+                        style={{marginBottom: "100px"}}
+                        pagination={false}
+                        dataSource={students}
+                        columns={columns}
+                        rowKey="studentId"
+                    />
+                )}
+                <Modal
+                    title={"Add new student"}
+                    visible={isModalVisible}
+                    onOk={closeModal}
+                    onCancel={closeModal}
+                    width={1000}
+                >
+                    <AddStudentForm
+                        onSuccess={() => {
+                            closeModal();
+                            fetchStudents();
+                            openNotification("success", "Student added", "Student saved correctly");
+                        }}
+                    />
+                </Modal>
             </div>
             <Footer numberOfStudents={students.length} openModal={openModal}/>
         </Container>
