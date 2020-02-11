@@ -43,5 +43,21 @@ public class StudentDAO {
             return new Student(studentId, firstName, lastName, email, gender);
         };
     }
+
+    public int saveStudent(UUID studentId, Student student) {
+
+        String sql = "" +
+                "INSERT into student (student_id, first_name, last_name, email, gender) " +
+                "values(?, ?, ?, ?, ?);";
+
+        System.out.println("Saving student to db " + studentId + student);
+
+        return jdbcTemplate.update(sql,
+                studentId,
+                student.getFirstName(),
+                student.getLastName(),
+                student.getEmail(),
+                student.getGender().name().toUpperCase());
+    }
 }
 

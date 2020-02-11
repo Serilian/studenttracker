@@ -39,62 +39,68 @@ const AddStudentForm = () => {
                     return errors;
                 }}
                 onSubmit={(values, {isSubmitting}) => {
-                        isSubmitting = true;
-                        saveNewStudent(values)
-                            .then(resp => {
-                                console.log(resp);
-                                isSubmitting = false;
-                            });
-                    }
+                    isSubmitting = true;
+                    values.gender = values.gender.toUpperCase();
+                    saveNewStudent(values)
+                        .then(resp => {
+                            if (resp.ok) {
+                                alert("Student Added");
+                            }
+                            isSubmitting = false;
+                        }).catch(err => {
+                        console.log(err.message);
+                        isSubmitting = false;
+                    });
+                }
                 }>
                 {({values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting, submitForm, isValid}
-                ) => {
+                    ) => {
                     return (
-                        <form onSubmit={handleSubmit}>
-                            <Input
-                                style={{marginBottom: "5px"}}
-                                name="firstName"
-                                value={values.firstName}
-                                onChange={handleChange}
-                                placeholder={"First Name"}
-                                onBlur={handleBlur}
-                            />
-                            {errors.firstName && touched.firstName && <Tag style={tagStyle}>{errors.firstName}</Tag>}
-                            <Input
-                                style={{marginBottom: "5px"}}
-                                name="lastName"
-                                value={values.lastName}
-                                onChange={handleChange}
-                                placeholder={"Last Name"}
-                                onBlur={handleBlur}
-                            />
-                            {errors.lastName && touched.lastName && <Tag style={tagStyle}>{errors.lastName}</Tag>}
-                            <Input
-                                style={{marginBottom: "5px"}}
-                                name="email"
-                                value={values.email}
-                                onChange={handleChange}
-                                placeholder={"Email"}
-                                onBlur={handleBlur}
-                            />
-                            {errors.email && touched.email && <Tag style={tagStyle}>{errors.email}</Tag>}
-                            <Input
-                                style={{marginBottom: "5px"}}
-                                name="gender"
-                                value={values.gender}
-                                onChange={handleChange}
-                                placeholder={"Gender: male, female, unknown"}
-                                onBlur={handleBlur}
-                            />
-                            {errors.gender && touched.gender && <Tag style={tagStyle}>{errors.gender}</Tag>}
-                            <hr/>
-                            <Button type="submit" onClick={submitForm} disabled={isSubmitting || !isValid}>Submit</Button>
-                        </form>
+                    <form onSubmit={handleSubmit}>
+                    <Input
+                    style={{marginBottom: "5px"}}
+                    name="firstName"
+                    value={values.firstName}
+                    onChange={handleChange}
+                    placeholder={"First Name"}
+                    onBlur={handleBlur}
+                    />
+                    {errors.firstName && touched.firstName && <Tag style={tagStyle}>{errors.firstName}</Tag>}
+                    <Input
+                    style={{marginBottom: "5px"}}
+                    name="lastName"
+                    value={values.lastName}
+                    onChange={handleChange}
+                    placeholder={"Last Name"}
+                    onBlur={handleBlur}
+                    />
+                    {errors.lastName && touched.lastName && <Tag style={tagStyle}>{errors.lastName}</Tag>}
+                    <Input
+                    style={{marginBottom: "5px"}}
+                    name="email"
+                    value={values.email}
+                    onChange={handleChange}
+                    placeholder={"Email"}
+                    onBlur={handleBlur}
+                    />
+                    {errors.email && touched.email && <Tag style={tagStyle}>{errors.email}</Tag>}
+                    <Input
+                    style={{marginBottom: "5px"}}
+                    name="gender"
+                    value={values.gender}
+                    onChange={handleChange}
+                    placeholder={"Gender: male, female, unknown"}
+                    onBlur={handleBlur}
+                    />
+                    {errors.gender && touched.gender && <Tag style={tagStyle}>{errors.gender}</Tag>}
+                    <hr/>
+                    <Button type="submit" onClick={submitForm} disabled={isSubmitting || !isValid}>Submit</Button>
+                    </form>
                     )
                 }}
-            </Formik>
-        </div>
-    );
-};
+                    </Formik>
+                    </div>
+                    );
+                    };
 
-export default AddStudentForm;
+                    export default AddStudentForm;
