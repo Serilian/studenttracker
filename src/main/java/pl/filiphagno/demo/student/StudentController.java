@@ -17,8 +17,8 @@ public class StudentController {
     }
 
     @GetMapping("/students")
-    public List<Student> getAllStudents() {
-//        throw new IllegalArgumentException();
+    public List<Student> getAllStudents() throws ApiRequestException {
+//        throw new ApiRequestException("Not givin' you any students");
         return studentService.getAllStudents();
     }
 
@@ -28,3 +28,4 @@ public class StudentController {
     }
 
 }
+
