@@ -10,10 +10,12 @@ import java.util.UUID;
 @Service
 public class StudentService {
 
-    private StudentDAO studentDAO;
+    private final StudentDAO studentDAO;
+    private final EmailValidator emailValidator;
 
     @Autowired
-    public StudentService(StudentDAO studentDAO) {
+    public StudentService(StudentDAO studentDAO, EmailValidator emailValidator) {
+        this.emailValidator = emailValidator;
         this.studentDAO = studentDAO;
     }
 
@@ -21,16 +23,22 @@ public class StudentService {
         return studentDAO.selectAllStudents();
     }
 
-    public void saveStudent(UUID studentID, Student student) {
+    public void saveStudent(UUID studentID, Student student) throws ApiRequestException {
         UUID newStudentId = Optional.ofNullable(studentID).orElse(UUID.randomUUID());
+
+        if(emailValidator.test(student.getEmail())) {
+            if(studentDAO.saveStudent(newStudentId, student) ==1) {
+                System.out.println("Student added!");
+            };
+        } else {
+            throw new ApiRequestException("Invalid email for student: " + student.getEmail());
+        }
 
         //TODO: veryfi email not taken
 
-        if(studentDAO.saveStudent(newStudentId, student) ==1) {
-            System.out.println("Student added!");
-        };
+
     }
-    public void saveStudent(Student student) {
+    public void saveStudent(Student student) throws ApiRequestException {
         this.saveStudent(null, student);
     }
 }
