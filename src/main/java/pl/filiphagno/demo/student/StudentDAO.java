@@ -46,18 +46,28 @@ public class StudentDAO {
 
     public int saveStudent(UUID studentId, Student student) {
 
+            String sql = "" +
+                    "INSERT into student (student_id, first_name, last_name, email, gender) " +
+                    "values(?, ?, ?, ?, ?);";
+
+            System.out.println("Saving student to db " + studentId + student);
+
+            return jdbcTemplate.update(sql,
+                    studentId,
+                    student.getFirstName(),
+                    student.getLastName(),
+                    student.getEmail(),
+                    student.getGender().name().toUpperCase());
+    }
+
+    boolean isEmailTaken(String email) {
         String sql = "" +
-                "INSERT into student (student_id, first_name, last_name, email, gender) " +
-                "values(?, ?, ?, ?, ?);";
+                "SELECT exists ( select 1 " +
+                "FROM student " +
+                "WHERE email = ? );";
 
-        System.out.println("Saving student to db " + studentId + student);
-
-        return jdbcTemplate.update(sql,
-                studentId,
-                student.getFirstName(),
-                student.getLastName(),
-                student.getEmail(),
-                student.getGender().name().toUpperCase());
+        return jdbcTemplate.queryForObject(sql, new Object[]{email},
+                ((resultSet, i) -> resultSet.getBoolean(1)));
     }
 }
 
