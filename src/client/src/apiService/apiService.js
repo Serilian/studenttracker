@@ -13,3 +13,7 @@ export const saveNewStudent = student => {
     body: JSON.stringify(student)
   });
 };
+
+export const fetchCoursesForStudent = (id)=> {
+  return fetch(`api/${id}/courses`);
+};

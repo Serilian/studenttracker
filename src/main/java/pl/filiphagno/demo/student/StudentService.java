@@ -42,4 +42,10 @@ public class StudentService {
     public void saveStudent(Student student) throws ApiRequestException {
         this.saveStudent(null, student);
     }
+
+    public List<StudentCourse> getAllCoursesForStudent(UUID studentId) {
+
+        return studentDAO.getAllCoursesForStudent(studentId);
+
+    }
 }

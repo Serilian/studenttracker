@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
@@ -26,6 +27,11 @@ public class StudentController {
     @PostMapping("/students")
     public void addStudent(@RequestBody @Valid Student student) throws ApiRequestException {
         studentService.saveStudent(student);
+    }
+
+    @GetMapping("{studentId}/courses")
+    public List<StudentCourse> getAllCoursesForStudent(@PathVariable UUID studentId) {
+        return studentService.getAllCoursesForStudent(studentId);
     }
 }
 

@@ -1,15 +1,17 @@
-import React, {useEffect, useState} from "react";
+import React, {Fragment, useEffect, useState} from "react";
 import "./App.css";
-import {Avatar, Table, Spin, Icon, Modal, notification, Empty} from "antd";
+import {Avatar, Table, Spin, Icon, Modal, notification, Empty, Button} from "antd";
 import Container from "./components/Container";
 import Footer from "./components/Footer";
 import AddStudentForm from "./components/AddStudentForm";
-import {fetchAllStudents} from "./apiService/apiService";
+import {fetchAllStudents, fetchCoursesForStudent} from "./apiService/apiService";
 
 function App() {
     let [students, setStudents] = useState([]);
+    let [studentCourses, setStudentCourses] = useState([]);
     let [fetching, setFetching] = useState(false);
     let [isModalVisible, setModalVisible] = useState(false);
+    let [isCourseModalVisible, setCourseModalVisible] = useState(false);
 
     const fetchStudents = () => {
         setFetching(true);
@@ -64,6 +66,7 @@ function App() {
 
     const closeModal = () => {
         setModalVisible(false);
+        setCourseModalVisible(false);
     };
 
     const columns = [
@@ -97,6 +100,24 @@ function App() {
             title: "Gender",
             dataIndex: "gender",
             key: "gender"
+        },
+        {
+            title: "Courses",
+            key: "courses",
+            render: (text, student) => (
+                <Button onClick={async (e) => {
+                    console.log(student);
+                    try {
+                        let resp = await fetchCoursesForStudent(student.studentId);
+                        let studentCourses = await resp.json();
+                        setStudentCourses(studentCourses);
+                        setCourseModalVisible(true);
+                    } catch (error) {
+                        openNotification("error", JSON.stringify(error));
+
+                    }
+                }}>Student courses</Button>
+            )
         }
     ];
 
@@ -163,6 +184,31 @@ function App() {
                             openNotification("error", err.status, err.message);
                         }}
                     />
+                </Modal>
+                <Modal
+                    title={"Student courses"}
+                    visible={isCourseModalVisible}
+                    onOk={closeModal}
+                    onCancel={closeModal}
+                    width={1000}
+                >
+                    <Container>
+                        {studentCourses.length > 0 ? (
+                                studentCourses.map((course) => (
+                                    <Fragment key={course.studentId}>
+                                        <h3>Course name: {course.name}</h3>
+                                        <p>Description: {course.description}</p>
+                                        <p>Started:: {course.startDate}</p>
+                                        <p>Ended: {course.endDate}</p>
+                                        <p>Grade: {course.endDate}</p>
+                                        <p>Teacher name: {course.teacherName}</p>
+                                        <hr/>
+                                    </Fragment>
+                                ))
+                            ) :
+                            <Empty description={"No courses found for given student"}/>
+                        }
+                    </Container>
                 </Modal>
             </div>
             <Footer numberOfStudents={students.length} openModal={openModal}/>
