@@ -9,6 +9,7 @@ import java.util.UUID;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
+@RequestMapping("/api")
 public class StudentController {
 
     private StudentService studentService;
@@ -20,7 +21,6 @@ public class StudentController {
 
     @GetMapping("/students")
     public List<Student> getAllStudents() throws ApiRequestException {
-//        throw new ApiRequestException("Not givin' you any students");
         return studentService.getAllStudents();
     }
 
